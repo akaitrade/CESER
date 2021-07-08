@@ -17,7 +17,7 @@ function main()
 			if(d.CS_NET === undefined)
 			{
 				chrome.storage.local.set({CS_NET: {Name:"MainNet", Url:"161.97.121.0", Port:"8081", Mon:"CreditsNetwork"}});
-				CS_NET = {Name: "test", Url:"161.97.121.0", Port:"8081", Mon:"CreditsNetwork"};
+				CS_NET = {Name: "Mainnet", Url:"161.97.121.0", Port:"8081", Mon:"CreditsNetwork"};
 				//CS_NET = {Name: "test",Url: "165.22.212.41",Port:"18081",Mon:"testnet"};
 			}else{
 				CS_NET = d.CS_NET;

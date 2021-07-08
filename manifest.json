@@ -35,6 +35,7 @@
 	  "matches": [
 		"*://credits.com/*",
 		"*://telegram.ru.com/*",
+		"*://161.97.121.0/*",
 		"*://localhost:*//*",
 		"*://creditsevents.com/*"
 		],
