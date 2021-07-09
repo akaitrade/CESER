@@ -18,7 +18,6 @@ function main()
 			{
 				chrome.storage.local.set({CS_NET: {Name:"MainNet", Url:"161.97.121.0", Port:"8081", Mon:"CreditsNetwork"}});
 				CS_NET = {Name: "Mainnet", Url:"161.97.121.0", Port:"8081", Mon:"CreditsNetwork"};
-				//CS_NET = {Name: "test",Url: "165.22.212.41",Port:"18081",Mon:"testnet"};
 			}else{
 				CS_NET = d.CS_NET;
 			}
@@ -187,7 +186,7 @@ function RenderMain()
 				<div class="top-line-part2">
 					<div class="login">
 						<select id="CS_Net" class="button-c button100">
-							<option value="main" Url="165.22.220.8" Port="8081" Mon="CreditsNetwork">CreditsNetwork</option>
+							<option value="main" Url="161.97.121.0" Port="8081" Mon="CreditsNetwork">Centre-Net</option>
 							<option value="testnet" Url="165.22.212.41" Port="18081" Mon="testnet">TestNet</option>
 						 </select>
 					</div>
