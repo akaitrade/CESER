@@ -17,6 +17,20 @@ chrome.runtime.onMessage.addListener( (m, s, c) => {
 	}
 });
 
+// sodium is loaded but not initialized yet
+sodium.ready.then(sodiumInitialized).catch(sodiumNotInitialized);
+
+function sodiumInitialized() {
+	console.log("sodium initialized");
+	
+	let h = sodium.crypto_generichash(64, sodium.from_string("test"));
+	console.log(sodium.to_hex(h));
+}
+
+function sodiumNotInitialized(error) {
+	console.log("sodium initialize error", error);
+}
+
 chrome.runtime.onMessageExternal.addListener((m, s, c) => {
 	let Res = {
 		message: undefined,
@@ -64,6 +78,72 @@ chrome.runtime.onMessageExternal.addListener((m, s, c) => {
 				return;
 			});
 		});
+	}
+	else if(m.method != undefined && m.method == 'CS_Extension_Decrypt'){
+		chrome.storage.local.get(['CS_PublicKey',"CS_NET","CS_PrivateKey"], function(d) {
+			if(d.CS_NET === undefined)
+			{
+				Res.message = "Network is not set";
+				c(Res);
+				return;
+			}
+			try{
+				const userdata_str = String(m.userdata);
+			const nonce_str = String(m.nonce);
+			const publickey_str = String(m.publickey);
+			const privatekey_str = String(d.CS_PrivateKey);
+			let shared = sodium.crypto_scalarmult(sodium.crypto_sign_ed25519_sk_to_curve25519(Base58.decode(privatekey_str)),sodium.crypto_sign_ed25519_pk_to_curve25519(Base58.decode(publickey_str)));
+			const byteCharacters = atob(nonce_str);
+			const byteNumbers = new Array(byteCharacters.length);
+			for (let i = 0; i < byteCharacters.length; i++) {
+				byteNumbers[i] = byteCharacters.charCodeAt(i);
+			} 
+			var decrypted = new TextDecoder().decode(sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(null,Base58.decode(userdata_str),null,new Uint8Array(byteNumbers),shared));
+			Res.result = decrypted;
+			c(Res);
+
+			}
+			catch (error) {
+				Res.message = "Error Decrypting";
+				c(Res);
+			}
+			
+
+
+		})
+
+	}
+	else if(m.method != undefined && m.method == 'CS_Extension_TransactionGet'){
+		chrome.storage.local.get(['CS_PublicKey',"CS_NET"], function(d) {
+			if(d.CS_NET === undefined)
+			{
+				Res.message = "Network is not set";
+				c(Res);
+				return;
+			}
+			Url = d.CS_NET.Url;
+			Port = d.CS_NET.Port;
+			let Key;
+			if(m.Key === undefined){
+				Key = d.CS_PublicKey;
+			}else{
+				Key = m.Key;
+			}
+			var txsid = SignCS.ConvertTransactionId(m.pool,m.index)
+			SignCS.Connect().TransactionGet(txsid,function(r){
+				if(r.status.code > 0 && r.status.message != "Not found")
+				{
+					Res.message = r.status.message;
+				}
+				else
+				{
+					Res.result = r
+				}
+				c(Res);
+				return;
+			});
+		});
+	
 	} else if (m.method != undefined && m.method == "CS_Extension_Transaction"){
 		if(typeof m.Trans !== "object")
 		{
@@ -174,11 +254,11 @@ chrome.runtime.onMessageExternal.addListener((m, s, c) => {
 			Port = d.CS_NET.Port;
 			
 			let PubKey;
-			if(m.Key === undefined)
+			if(m.Data.Key === undefined)
 			{
 				PubKey = d.CS_PublicKey;
 			}else{
-				PubKey = m.Key;
+				PubKey = m.Data.Key;
 			}
 			
 			try	
@@ -191,8 +271,8 @@ chrome.runtime.onMessageExternal.addListener((m, s, c) => {
 				c(Res);
 				return;
 			}
-			
 			SignCS.Connect().TransactionsGet(PubKey,m.Data.Page * m.Data.Size - m.Data.Size,m.Data.Size,r => {
+				
 				if(r.status.code > 0)
 				{
 					Res.message = r.status.message;
@@ -204,13 +284,15 @@ chrome.runtime.onMessageExternal.addListener((m, s, c) => {
 					{
 						let val = r.transactions[i];
 						Res.result.push({
-							id: `${ByteToHex(StrToByte(val.id.poolHash))}.${val.id.index}`,
+							id: `${val.id.poolSeq}.${val.id.index}`,
 							amount: val.trxn.amount.integral + val.trxn.amount.fraction * Math.pow(10,-18),
 							fee: SignCS.FeeToNumber(val.trxn.fee.commission),
 							source: Base58.encode(StrToByte(val.trxn.source)),
 							target: Base58.encode(StrToByte(val.trxn.target)),
+							userdata: val.trxn.userFields,
 							smartContract: val.trxn.smartContract,
-							smartInfo: val.trxn.smartInfo
+							smartInfo: val.trxn.smartInfo,
+							timecreation: val.trxn.timeCreation
 						});
 					}
 				}
@@ -271,6 +353,20 @@ chrome.runtime.onMessageExternal.addListener((m, s, c) => {
 			else
 			{
 				Res.result = d.CS_NET.Mon;
+			}
+			c(Res);
+		});
+	}
+	else if (m === "CS_CurPub")
+	{
+		chrome.storage.local.get(["CS_NET","CS_PublicKey"], d => {
+			if(d.CS_NET === undefined)
+			{
+				Res.message = "User is not authorized";
+			}
+			else
+			{
+				Res.result = d.CS_PublicKey
 			}
 			c(Res);
 		});

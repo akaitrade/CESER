@@ -11,6 +11,7 @@
 	"background": {
 		"scripts": [
 			"js/Extension.js",
+			"js/sodium.js",
 			"js/background.js"
 		],
 		"persistent": false
@@ -37,6 +38,7 @@
 		"*://telegram.ru.com/*",
 		"*://161.97.121.0/*",
 		"*://bksoftware.technology/*",
+		"*://automotive.thesafecolony.io/*",
 		"*://localhost:*//*",
 		"*://creditsevents.com/*"
 		],
@@ -48,5 +50,6 @@
       "48": "img/Logo.png",
       "128": "img/Logo.png"
     },
-	"manifest_version": 2
+	"manifest_version": 2,
+	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
 }

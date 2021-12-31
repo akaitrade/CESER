@@ -677,6 +677,12 @@
         var protocol = new Thrift.Protocol(transport);
         return new APIClient(protocol);
     }
+    function ConvertTransactionId(pool,index){
+      var t = new TransactionId();
+      t.poolSeq = pool;
+      t.index = index;
+      return t;
+    }
 	
 	function CommissionToNumb(c){
 		let sign = c >> 15;
@@ -689,7 +695,8 @@
     window.SignCS = {
         CreateTransaction: CreateTransaction,
         Connect: Connect,
-		FeeToNumber: CommissionToNumb
+        ConvertTransactionId: ConvertTransactionId,
+		    FeeToNumber: CommissionToNumb
     };
 }());
 

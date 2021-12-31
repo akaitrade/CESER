@@ -37,6 +37,71 @@ console.log("Credits Api");
 				}
 				return Res;
 			},
+			Decrypt: function(Obj,callBack)
+			{
+				console.log("Decrypt");
+				let Res = {
+					result: false,
+					message: undefined
+				};
+				if(Obj === undefined)
+				{
+					Obj = {};
+				}
+				
+				if(typeof Obj !== "object")
+				{
+					Res.message = "Obj is not an object";
+				}
+				else
+				{
+				
+					if(typeof callBack !== "function")
+					{
+						Res.message = "Callback is not a function";
+					}
+					else
+					{
+						Obj.method = "CS_Extension_Decrypt";
+						SendMess(CS_Extension_Id,Obj,callBack);
+						Res.result = true;
+					}
+				}
+				return Res;
+			},
+			TransactionGet: function(Obj,callBack)
+			{
+				console.log("TransactionGet");
+				let Res = {
+					result: false,
+					message: undefined
+				};
+				
+				if(Obj === undefined)
+				{
+					Obj = {};
+				}
+				
+				if(typeof Obj !== "object")
+				{
+					Res.message = "Obj is not an object";
+				}
+				else
+				{
+				
+					if(typeof callBack !== "function")
+					{
+						Res.message = "Callback is not a function";
+					}
+					else
+					{
+						Obj.method = "CS_Extension_TransactionGet";
+						SendMess(CS_Extension_Id,Obj,callBack);
+						Res.result = true;
+					}
+				}
+				return Res;
+			},
 			sendTransaction: function(Transaction,callBack)
 			{
 				console.log("sendTransaction");
@@ -66,7 +131,6 @@ console.log("Credits Api");
 			getHistory: function(Obj,callBack)
 			{
 				console.log("getHistory");
-				
 				let Res = {
 					result: false,
 					message: undefined
@@ -171,8 +235,24 @@ console.log("Credits Api");
 					Res.message = "Callback is not a function";
 					return Res;
 				}
-				
 				SendMess(CS_Extension_Id,"CS_CurNet",callBack);
+				Res.result = true;
+				return Res;
+			},
+			CurPub: (callBack) => 
+			{
+				console.log("CurPub");
+				
+				let Res = {
+					result: false,
+					message: undefined
+				};
+				if(typeof callBack !== "function")
+				{
+					Res.message = "Callback is not a function";
+					return Res;
+				}
+				SendMess(CS_Extension_Id,"CS_CurPub",callBack);
 				Res.result = true;
 				return Res;
 			}
