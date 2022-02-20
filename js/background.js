@@ -89,29 +89,44 @@ chrome.runtime.onMessageExternal.addListener((m, s, c) => {
 			}
 			try{
 				const userdata_str = String(m.userdata);
-			const nonce_str = String(m.nonce);
-			const publickey_str = String(m.publickey);
-			const privatekey_str = String(d.CS_PrivateKey);
-			let shared = sodium.crypto_scalarmult(sodium.crypto_sign_ed25519_sk_to_curve25519(Base58.decode(privatekey_str)),sodium.crypto_sign_ed25519_pk_to_curve25519(Base58.decode(publickey_str)));
-			const byteCharacters = atob(nonce_str);
-			const byteNumbers = new Array(byteCharacters.length);
-			for (let i = 0; i < byteCharacters.length; i++) {
-				byteNumbers[i] = byteCharacters.charCodeAt(i);
-			} 
-			var decrypted = new TextDecoder().decode(sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(null,Base58.decode(userdata_str),null,new Uint8Array(byteNumbers),shared));
-			Res.result = decrypted;
-			c(Res);
-
+				const nonce_str = String(m.nonce);
+				const publickey_str = String(m.publickey);
+				const privatekey_str = String(d.CS_PrivateKey);
+				let shared = sodium.crypto_scalarmult(sodium.crypto_sign_ed25519_sk_to_curve25519(Base58.decode(privatekey_str)),sodium.crypto_sign_ed25519_pk_to_curve25519(Base58.decode(publickey_str)));
+				var decrypted = new TextDecoder().decode(sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(null,Base58.decode(userdata_str),null, Base58.decode(nonce_str),shared));
+				Res.result = decrypted;
+				c(Res);
 			}
 			catch (error) {
 				Res.message = "Error Decrypting";
 				c(Res);
 			}
-			
-
-
 		})
-
+	}
+	else if(m.method != undefined && m.method == 'CS_Extension_Encrypt'){
+		chrome.storage.local.get(['CS_PublicKey',"CS_NET","CS_PrivateKey"], function(d) {
+			if(d.CS_NET === undefined)
+			{
+				Res.message = "Network is not set";
+				c(Res);
+				return;
+			}
+			try{
+				const userdata_str = String(m.userdata);
+				const publickey_str = String(m.publickey);
+				const privatekey_str = String(d.CS_PrivateKey);
+				let nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+				let shared = sodium.crypto_scalarmult(sodium.crypto_sign_ed25519_sk_to_curve25519(Base58.decode(privatekey_str)),sodium.crypto_sign_ed25519_pk_to_curve25519(Base58.decode(publickey_str)));
+				var encrypted = new TextDecoder().decode(sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(StrToByte(userdata_str),null,null,new Uint8Array(nonce),shared));
+				Res.result = {encrypted: encrypted, key: Base58.encode(nonce) };
+				c(Res);
+			}
+			catch (error) {
+				Res.message = "Error Encrypting";
+				alert(error)
+				c(Res);
+			}
+		})
 	}
 	else if(m.method != undefined && m.method == 'CS_Extension_TransactionGet'){
 		chrome.storage.local.get(['CS_PublicKey',"CS_NET"], function(d) {

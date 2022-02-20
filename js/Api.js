@@ -69,6 +69,38 @@ console.log("Credits Api");
 				}
 				return Res;
 			},
+			Encrypt: function(Obj,callBack)
+			{
+				console.log("Encrypt");
+				let Res = {
+					result: false,
+					message: undefined
+				};
+				if(Obj === undefined)
+				{
+					Obj = {};
+				}
+				
+				if(typeof Obj !== "object")
+				{
+					Res.message = "Obj is not an object";
+				}
+				else
+				{
+				
+					if(typeof callBack !== "function")
+					{
+						Res.message = "Callback is not a function";
+					}
+					else
+					{
+						Obj.method = "CS_Extension_Encrypt";
+						SendMess(CS_Extension_Id,Obj,callBack);
+						Res.result = true;
+					}
+				}
+				return Res;
+			},
 			TransactionGet: function(Obj,callBack)
 			{
 				console.log("TransactionGet");
