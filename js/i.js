@@ -1,10 +1,10 @@
 
 
 
-	let s = document.createElement('script');
-	s.src = chrome.runtime.getURL('js/Api.js');
-	s.onerror = function(){console.log("Onerro")}
-	document.head.appendChild(s,document.head.firstChild);
+	let sl = document.createElement('script');
+	sl.src = chrome.runtime.getURL('js/Api.js');
+	sl.onerror = function(){console.log("Onerro")}
+	document.head.appendChild(sl,document.head.firstChild);
 	
 	let i = document.createElement("input");
 	i.type = "hidden";

@@ -117,8 +117,8 @@ chrome.runtime.onMessageExternal.addListener((m, s, c) => {
 				const privatekey_str = String(d.CS_PrivateKey);
 				let nonce = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
 				let shared = sodium.crypto_scalarmult(sodium.crypto_sign_ed25519_sk_to_curve25519(Base58.decode(privatekey_str)),sodium.crypto_sign_ed25519_pk_to_curve25519(Base58.decode(publickey_str)));
-				var encrypted = new TextDecoder().decode(sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(StrToByte(userdata_str),null,null,new Uint8Array(nonce),shared));
-				Res.result = {encrypted: encrypted, key: Base58.encode(nonce) };
+				var encrypted = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(StrToByte(userdata_str),null,null,new Uint8Array(nonce),shared);
+				Res.result = {encrypted: Base58.encode(encrypted), key: Base58.encode(nonce) };
 				c(Res);
 			}
 			catch (error) {
