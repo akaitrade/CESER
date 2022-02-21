@@ -1,4 +1,4 @@
-# CESER
+# CESER(Modified)
 
 CESER - is the decentralized application working like a browser's extension connecting with the blockchain Credits. It allows you to connect directly to the network without entering a password on the sites increasing the security and usability. Create wallets and make transfers.
 
