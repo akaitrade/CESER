@@ -16,8 +16,8 @@ function main()
 			CS_PrivateKey = Base58.decode(d.CS_PrivateKey);
 			if(d.CS_NET === undefined)
 			{
-				chrome.storage.local.set({CS_NET: {Name:"MainNet", Url:"65.21.204.48", Port:"8080", Mon:"CreditsNetwork"}});
-				CS_NET = {Name: "Mainnet", Url:"65.21.204.48", Port:"8080", Mon:"CreditsNetwork"};
+				chrome.storage.local.set({CS_NET: {Name:"MainNet", Url:"94.72.102.79", Port:"8081", Mon:"CreditsNetwork"}});
+				CS_NET = {Name: "Mainnet", Url:"94.72.102.79", Port:"8081", Mon:"CreditsNetwork"};
 			}else{
 				CS_NET = d.CS_NET;
 			}
